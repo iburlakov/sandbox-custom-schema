@@ -8,7 +8,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate> {
+    BOOL isSubscribed;
+}
 
 @property (unsafe_unretained) IBOutlet NSTextView *logTextView;
 

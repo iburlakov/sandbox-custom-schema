@@ -15,22 +15,29 @@
 
 @implementation AppDelegate
 
+-(void)applicationWillFinishLaunching:(NSNotification *)notification {
+    // subscribe
+    [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
+                                                       andSelector:@selector(handleGetURLEvent:withReplyEvent:)
+                                                     forEventClass:kInternetEventClass
+                                                        andEventID:kAEGetURL];
+    isSubscribed = true;
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // show schemas in window's title
     NSArray *urlTypes = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleURLTypes"];
     NSArray *schemas = [[urlTypes firstObject] objectForKey:@"CFBundleURLSchemes"];
     NSString *schemasStr = [schemas componentsJoinedByString:@", "];
     
-    self.window.title = [NSString stringWithFormat:@"%@ (%@)", self.window.title, schemasStr];
-    
-    // subscribe
-    [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
-                                                        andSelector:@selector(handleGetURLEvent:withReplyEvent:)
-                                                      forEventClass:kInternetEventClass
-                                                         andEventID:kAEGetURL];
-    
-    NSRange r = NSMakeRange(self.logTextView.string.length, 0);
-    [self.logTextView insertText:[NSString stringWithFormat:@"Subscribed to handle schemas: %@", schemasStr] replacementRange:r];
+    if (isSubscribed) {
+        self.window.title = [NSString stringWithFormat:@"%@ (%@)", self.window.title, schemasStr];
+
+        NSRange r = NSMakeRange(self.logTextView.string.length, 0);
+        [self.logTextView insertText:[NSString stringWithFormat:@"Subscribed to handle schemas: %@", schemasStr] replacementRange:r];
+    } else {
+        self.window.title = [NSString stringWithFormat:@"%@ (%@)", self.window.title, @"not subscribed"];
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
